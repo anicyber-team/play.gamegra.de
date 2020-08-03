@@ -1,5 +1,5 @@
 # play.gamegra.de
-play and review games :D
+play and vote on games :D
 
 ## installation
 - Download the repo as a zip/wget it!
