@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>play.gamegra.de</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="icon" href="favicon.ico"> 
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="static/bootstrap.min.css">
+    <style>
+    .bigGame {
+        position:absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    .btn-lg {
+        background: #daa420;
+        border: none;
+    }
+    .btn-lg:hover {
+        border: none;
+    }
+    .card-img-top {
+        max-height: 280px;
+    }
+    .randy {
+        background-image: url("img/randy.PNG");
+        background-size: 10vw;
+        background-repeat: no-repeat;
+        background-position-y: bottom;
+        background-position-x: left;
+    }
+    .dark {
+        background-color: #232627;
+    }
+    .darker {
+        background-color: #181a1b;
+        color: white;
+    }
+    .card-columns .card {
+        background: #262728;
+        color: #daa420;
+    }
+    .card:hover {
+        box-shadow: 1px 2px 3px 2px #daa420;
+    }
+    span.line {
+        display: inline-block;
+    }
+    .badge {
+        line-height: 2;
+        width: 30%;
+    }
+    .alert {
+        float:right;
+    }
+    .score {
+        font-size: larger;
+    }
+    </style>
+  </head>
+  <body class="darker">
+
+    <nav class="nav justify-content-center">
+      <a class="nav-link" href="//gamegra.de">back to gamegrade proper</a>
+    </nav>
+
+    <div class="jumbotron jumbotron-fluid dark randy">
+        <div class="container">
+            <div id="voted-notif" class="alert alert-info alert-dismissible fade show" role="alert" style="display:none;">
+                <strong>Yayy!!</strong> You voted.
+            </div>
+
+            <h1 class="display-3">Welcome to <span class="text-warning line">play</span>.gamegra<span class="line">.de</span></h1>
+            <p class="lead">Find a game and start winning, son.</p>
+            <hr class="my-2">
+            <p>Or click this button and be surprised!</p>
+            <p class="lead">
+                <a class="btn btn-primary btn-lg" onclick="playRandom()" role="button" style="color: white;">I'm feeling randy</a>
+            </p>
+        </div>
+    </div>
+    <div class="container">
+        
+        <h3 class="lead">
+            Multiplayer Games (heard u like .io)
+        </h3>
+
+        <div class="card-columns" id="games">
+
+        </div>
+
+    </div>   
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="static/jquery-3.3.1.min.js"></script>
+    <script src="static/popper.min.js"></script>
+    <script src="static/bootstrap.min.js"></script>
+    <script>
+          // create the game nodes
+          function addGames(games) {
+            for (var game of Object.entries(games)) {
+                // main link node
+                var gameA = document.createElement("a");
+                gameA.classList.add("card");
+                gameA.classList.add("game");
+                gameA.href = "/game/" + game[1][1].slug;
+                gameA.alt = game[1][0].title;
+
+                // create card title, text, body, insert into card body
+                var gameT = document.createElement("h4");
+                gameT.classList.add("card-title");
+                gameT.innerText = game[1][0].title;
+
+                var gameP = document.createElement("p");
+                gameP.classList.add("card-text");
+                gameP.innerText = game[1][2].description;
+
+                var gameB = document.createElement("div");
+                gameB.classList.add("card-body");
+
+                gameB.appendChild(gameT);
+                gameB.appendChild(gameP);
+
+                // create img
+                var gameI = document.createElement("img");
+                gameI.classList.add("card-img-top");
+                gameI.src = "/static/" + game[1][1].slug + ".PNG";
+                
+
+                // insert all into main link node
+                gameA.appendChild(gameI);
+                gameA.appendChild(gameB);
+
+                document.getElementById("games").appendChild(gameA);
+            }
+        }
+
+        function addGamesAPI(games){
+            for (var game of Object.entries(games)) {
+                var gameA = document.createElement("a");
+                gameA.classList.add("card");
+                gameA.classList.add("game");
+                gameA.href = game[1].url;
+                gameA.alt = game[1].title;
+                gameA.id = game[1].slug;
+
+                // create card title, text, body, insert into card body
+                var gameT = document.createElement("h4");
+                gameT.classList.add("card-title");
+                gameT.innerText = game[1].title;
+
+                var gameP = document.createElement("p");
+                gameP.classList.add("card-text");
+                gameP.innerText = game[1].description;
+
+                var gameB = document.createElement("div");
+                gameB.classList.add("card-body");
+
+                var voteUp = document.createElement("a");
+                voteUp.classList.add("badge");
+                voteUp.classList.add("badge-pill");
+                voteUp.classList.add("badge-success");
+                voteUp.innerText = "up";
+                voteUp.href = "/api?command=vote&title="+game[1].title+"&value=up";
+                
+                var gameScore = document.createElement("span");
+                gameScore.classList.add("badge");
+                gameScore.classList.add("score");
+                gameScore.innerText = game[1].score;
+
+                var voteDown = document.createElement("a");
+                voteDown.classList.add("badge");
+                voteDown.classList.add("badge-pill");
+                voteDown.classList.add("badge-danger");
+                voteDown.innerText = "down";
+                voteDown.href = "/api?command=vote&title="+game[1].title+"&value=down";
+
+
+                gameB.appendChild(gameT);
+                gameB.appendChild(gameP);
+                gameB.appendChild(voteUp);
+                gameB.appendChild(gameScore);
+                gameB.appendChild(voteDown);
+
+                // create img
+                var gameI = document.createElement("img");
+                gameI.classList.add("card-img-top");
+                gameI.src = "/static/" + game[1].slug + ".PNG";
+                
+
+                // insert all into main link node
+                gameA.appendChild(gameI);
+                gameA.appendChild(gameB);
+
+                document.getElementById("games").appendChild(gameA);
+            }
+        }
+
+        function playRandom(){
+            document.getElementsByClassName("randy")[0].style.backgroundImage = "url(/static/randy2.PNG)";
+            document.getElementsByClassName("randy")[0].style.backgroundPosition = "center";
+            document.getElementsByClassName("randy")[0].style.backgroundSize = "auto";
+            setTimeout(() => {  
+            var options = document.getElementsByClassName("game");
+            console.log("yeeted");
+            location.href = options[Math.floor(Math.random()*options.length)];
+            }, 500);
+
+        }
+        
+        var gamesArray = {
+            0:[
+                {"title":"Discount Agario"},
+                {"slug":"dagario"},
+                {"description":"It's basically the same..."},
+            ],
+            1:[
+                {"title":"Krunker"},
+                {"slug":"krunker"},
+                {"description":"Better than CoD."},
+            ],
+            2:[
+                {"title":"Surviv.io"},
+                {"slug":"survivio"},
+                {"description":"Fornight wishes it was this good."},
+            ],
+        }
+
+        function updateData(){
+            document.getElementById("games").innerHTML = "";
+            $.ajax({ url: "/api?command=listGames",
+                    context: document.body,
+                    success: function(data){
+                        var remoteGamesArray = JSON.parse(data);
+                        addGamesAPI(remoteGamesArray);
+                        $('.badge').click(function(e) {
+                            e.preventDefault();
+                            $.ajax({
+                            url: e.target.href,
+                            type: "GET",
+                            success:function(){
+                                console.log("voted");
+                                document.getElementById("voted-notif").style.display="inline-block";
+                                updateData();
+                                return false;
+                            },
+                            error:function (){
+                                console.log("testing error");
+                            }
+                        });
+                            console.log(e.target.href);
+                        });
+                    },
+                    error: function(){
+                        addGames(gamesArray);
+                    }
+            });
+        }
+
+        $(document).ready(function(){
+           updateData();
+        });
+
+    </script>
+
+</body>
+</html>
